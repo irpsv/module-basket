@@ -4,6 +4,7 @@ namespace tests;
 
 use basket\Basket;
 use basket\BasketItem;
+use basket\BasketItemNotFoundException;
 use PHPUnit\Framework\TestCase;
 
 class BasketTest extends TestCase
@@ -54,7 +55,7 @@ class BasketTest extends TestCase
         $basket = new Basket();
         $basket->addItem($item1);
         $basket->addItem(
-            new BasketItem("data")
+            new BasketItem("data", 3)
         );
         $basket->addItem($item2);
         $basket->addItem($item2);
@@ -69,11 +70,11 @@ class BasketTest extends TestCase
             serialize($items[0]->getData())
         );
         $this->assertEquals(
-            2,
+            4,
             $items[0]->getCount()
         );
         $this->assertEquals(
-            6,
+            10,
             $items[1]->getCount()
         );
     }
@@ -143,16 +144,16 @@ class BasketTest extends TestCase
             count($items)
         );
         $this->assertEquals(
-            0,
+            1,
             $keys[0]
         );
         $this->assertEquals(
-            1,
+            3,
             $keys[1]
         );
         $this->assertEquals(
             serialize($item1),
-            serialize($items[0])
+            serialize($items[3])
         );
         $this->assertEquals(
             serialize($item2),
@@ -163,8 +164,39 @@ class BasketTest extends TestCase
     public function testGetItem()
     {
         $basket = new Basket();
-        $basket->addItem($item);
-        $basket->setItem(3, $item);
-        $basket->addItem($item);
+        $basket->addItem(new BasketItem("data1"));
+        $basket->addItem(new BasketItem("data2"));
+        $basket->setItem(10, new BasketItem("data3"));
+
+        $items = $basket->getItems();
+        $this->assertEquals(
+            serialize($items[0]),
+            serialize($basket->getItem(0))
+        );
+        $this->assertEquals(
+            serialize($items[1]),
+            serialize($basket->getItem(1))
+        );
+        $this->assertNull($basket->getItem(2));
+        $this->assertFalse(isset($items[2]));
+        $this->assertEquals(
+            serialize($items[10]),
+            serialize($basket->getItem(10))
+        );
+    }
+
+    public function testGetCountNotFoundItem()
+    {
+        $basket = new Basket();
+        $basket->addItem(new BasketItem("data", 5));
+
+        $this->assertEquals(
+            5,
+            $basket->getCount(0)
+        );
+        $this->assertEquals(
+            -1,
+            $basket->getCount(1)
+        );
     }
 }

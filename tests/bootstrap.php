@@ -69,3 +69,4 @@ class Psr4AutoloaderClass
 $loader = new Psr4AutoloaderClass();
 $loader->addNamespace('test', __DIR__.'/../test');
 $loader->addNamespace('basket', __DIR__.'/../src');
+$loader->register();
